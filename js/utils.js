@@ -48,9 +48,11 @@
     }
   }
 
-  window.GottoUtils = {
-    debounce: debounce,
-    safeText: safeText,
-    onReady: onReady,
-  };
+  if (!window.GottoUtils) {
+    window.GottoUtils = Object.freeze({
+      debounce: debounce,
+      safeText: safeText,
+      onReady: onReady,
+    });
+  }
 })(window);
