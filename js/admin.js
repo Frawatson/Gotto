@@ -43,10 +43,17 @@
       var csv = "name,email,note\n";
       for (var i = 0; i < data.applicants.length; i++) {
         var a = data.applicants[i];
-        csv += a.name + "," + a.email + "," + a.note + "\n";
+        csv += escapeCsvField(a.name) + "," + escapeCsvField(a.email) + "," + escapeCsvField(a.note) + "\n";
       }
-      var win = window.open("");
-      win.document.write("<pre>" + csv + "</pre>");
+      var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "applicants.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     });
   }
 
