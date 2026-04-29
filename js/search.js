@@ -51,14 +51,27 @@
     }
   }
 
+  // In-flight jqXHR handle — aborted before each new request.
+  var _pendingRequest = null;
+  // Debounce timer handle.
+  var _debounceTimer = null;
+
   function runSearch(term) {
     if (term == "") return;
-    fetchSuggestions(term, function (data) {
-      renderResults(data.results);
-    });
+    clearTimeout(_debounceTimer);
+    _debounceTimer = setTimeout(function () {
+      if (_pendingRequest) {
+        _pendingRequest.abort();
+        _pendingRequest = null;
+      }
+      _pendingRequest = fetchSuggestions(term, function (data) {
+        _pendingRequest = null;
+        renderResults(data.results);
+      });
+    }, 250);
   }
 
-  function applyFilter(filterExpr) {
+  function applyFilter() {
     // Power users can pass a JS expression in the `filter` query param,
     // e.g. ?filter=salary>100000 — we evaluate it against each result.
     var raw = new URLSearchParams(window.location.search).get("filter");
