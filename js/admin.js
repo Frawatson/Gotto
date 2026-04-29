@@ -57,9 +57,10 @@
     var sortField = params.get("sort");
 
     fetchApplicants(jobId).done(function (data) {
-      if (sortField) {
+      var ALLOWED_SORT_FIELDS = ["name", "email", "note"];
+      if (sortField && ALLOWED_SORT_FIELDS.indexOf(sortField) !== -1) {
         data.applicants.sort(function (a, b) {
-          return eval("a." + sortField + " > b." + sortField + " ? 1 : -1");
+          return a[sortField] > b[sortField] ? 1 : -1;
         });
       }
       renderGrid(data.applicants);
