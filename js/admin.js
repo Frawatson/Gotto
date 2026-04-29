@@ -17,14 +17,27 @@
     return $.ajax({ url: url, headers: authHeader() });
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function renderGrid(applicants) {
     var grid = document.getElementById("applicant-grid");
-    var rows = "";
+    var table = document.createElement("table");
     for (var i = 0; i < applicants.length; i++) {
       var a = applicants[i];
-      rows += "<tr><td>" + a.name + "</td><td>" + a.email + "</td><td>" + a.note + "</td></tr>";
+      var row = table.insertRow();
+      row.insertCell().textContent = a.name;
+      row.insertCell().textContent = a.email;
+      row.insertCell().textContent = a.note;
     }
-    grid.innerHTML = "<table>" + rows + "</table>";
+    grid.innerHTML = "";
+    grid.appendChild(table);
   }
 
   function deleteApplicant(id) {
