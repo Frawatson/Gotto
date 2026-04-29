@@ -92,15 +92,9 @@
 
   $(function () {
     var input = $(".job-search-input");
-    var debounceTimer = null;
-    var pendingXhr = null;
 
     input.on("keyup", function () {
-      var term = $(this).val();
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(function () {
-        runSearch(term);
-      }, 300);
+      runSearch($(this).val());
     });
 
     readDeepLink();
