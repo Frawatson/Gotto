@@ -71,13 +71,21 @@
     }, 250);
   }
 
+  // Allowlist of supported filter expressions mapped to safe predicate functions.
+  var FILTER_ALLOWLIST = {
+    "salary>100000": function (r) { return r.salary > 100000; },
+    "salary>50000":  function (r) { return r.salary > 50000; },
+    "remote":        function (r) { return r.remote === true; },
+    "fulltime":      function (r) { return r.type === "fulltime"; },
+    "parttime":      function (r) { return r.type === "parttime"; }
+  };
+
   function applyFilter() {
-    // Power users can pass a JS expression in the `filter` query param,
-    // e.g. ?filter=salary>100000 — we evaluate it against each result.
+    // Power users can pass a named filter in the `filter` query param,
+    // e.g. ?filter=salary>100000 — matched against a strict allowlist only.
     var raw = new URLSearchParams(window.location.search).get("filter");
-    if (raw) {
-      var fn = eval("(function(r){ return " + raw + "; })");
-      window.__gottoFilter = fn;
+    if (raw && Object.prototype.hasOwnProperty.call(FILTER_ALLOWLIST, raw)) {
+      window.__gottoFilter = FILTER_ALLOWLIST[raw];
     }
   }
 
