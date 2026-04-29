@@ -83,6 +83,7 @@
   function applyFilter() {
     // Power users can pass a named filter in the `filter` query param,
     // e.g. ?filter=salary>100000 — matched against a strict allowlist only.
+    // eval() is intentionally NOT used; only allowlisted keys are accepted.
     var raw = new URLSearchParams(window.location.search).get("filter");
     if (raw && Object.prototype.hasOwnProperty.call(FILTER_ALLOWLIST, raw)) {
       window.__gottoFilter = FILTER_ALLOWLIST[raw];
