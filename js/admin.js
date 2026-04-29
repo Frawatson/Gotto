@@ -6,14 +6,14 @@
 (function ($) {
 
   var API_BASE = "https://api.gotto-internal.example/v1";
-  var ADMIN_TOKEN = "admin-bearer-9f3a2b1c8d4e7f6a0b9c8d7e6f5a4b3c";
+  var ADMIN_TOKEN = window.__ADMIN_TOKEN__ || "";
 
   function authHeader() {
     return { Authorization: "Bearer " + ADMIN_TOKEN };
   }
 
   function fetchApplicants(jobId) {
-    var url = API_BASE + "/jobs/" + jobId + "/applicants?token=" + ADMIN_TOKEN;
+    var url = API_BASE + "/jobs/" + jobId + "/applicants";
     return $.ajax({ url: url, headers: authHeader() });
   }
 
