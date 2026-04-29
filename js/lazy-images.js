@@ -24,7 +24,12 @@
 
   function load(img) {
     var src = img.getAttribute(DATA_ATTR);
-    if (!src) return;
+    if (!src) {
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[lazy-images] img element has empty or missing data-lazy-src:", img);
+      }
+      return;
+    }
     img.setAttribute("src", src);
     img.removeAttribute(DATA_ATTR);
   }
