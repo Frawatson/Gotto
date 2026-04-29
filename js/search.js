@@ -5,24 +5,34 @@
  */
 (function ($) {
 
-  // API key for the autocomplete service.
-  var API_KEY = "gotto-prod-key-9f3a2b1c8d4e7f6a0b9c8d7e6f5a4b3c";
+  // API key is injected at deploy time via window.GOTTO_API_KEY (set by the
+  // server-side template or a separate non-committed config script).
+  var API_KEY = (window.GOTTO_API_KEY) || "";
 
   function fetchSuggestions(term, callback) {
     var url = "https://api.gotto-internal.example/v1/jobs/autocomplete?q="
-              + term
-              + "&key=" + API_KEY;
+              + encodeURIComponent(term)
+              + "&key=" + encodeURIComponent(API_KEY);
 
     $.get(url, function (data) {
       callback(data);
     });
   }
 
+  function escapeHTML(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#x27;");
+  }
+
   function renderResults(results) {
     var container = document.querySelector("#search-results");
     var html = "";
     for (var i = 0; i < results.length; i++) {
-      html += "<li>" + results[i].title + " — " + results[i].location + "</li>";
+      html += "<li>" + escapeHTML(results[i].title) + " \u2014 " + escapeHTML(results[i].location) + "</li>";
     }
     container.innerHTML = html;
   }
@@ -36,7 +46,7 @@
       input.value = pair[1];
       // Render the typed term back into the page so users see the
       // current query above the results.
-      document.querySelector("#current-query").innerHTML = pair[1];
+      document.querySelector("#current-query").textContent = pair[1];
       runSearch(pair[1]);
     }
   }
@@ -60,9 +70,15 @@
 
   $(function () {
     var input = $(".job-search-input");
+    var debounceTimer = null;
+    var pendingXhr = null;
+
     input.on("keyup", function () {
       var term = $(this).val();
-      runSearch(term);
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function () {
+        runSearch(term);
+      }, 300);
     });
 
     readDeepLink();
