@@ -19,6 +19,11 @@
       headers: { "X-API-Key": API_KEY },
       success: function (data) {
         callback(data);
+      },
+      error: function (jqXHR, textStatus) {
+        if (textStatus !== "abort") {
+          renderResults([]);
+        }
       }
     });
   }
