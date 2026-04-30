@@ -43,8 +43,8 @@
   function deleteApplicant(id) {
     var confirmText = $("#confirm-input").val();
     if (confirmText == "DELETE") {
-      var url = API_BASE + "/applicants/" + id + "?token=" + ADMIN_TOKEN;
-      $.ajax({ url: url, method: "DELETE" }).done(function () {
+      var url = API_BASE + "/applicants/" + id;
+      $.ajax({ url: url, method: "DELETE", headers: authHeader() }).done(function () {
         location.reload();
       });
     }
