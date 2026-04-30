@@ -76,14 +76,21 @@
     var jobId = params.get("job");
     var sortField = params.get("sort");
 
+    if (!jobId) {
+      return;
+    }
+
     fetchApplicants(jobId).done(function (data) {
+      var applicants = (data && Array.isArray(data.applicants)) ? data.applicants : [];
       var ALLOWED_SORT_FIELDS = ["name", "email", "note"];
       if (sortField && ALLOWED_SORT_FIELDS.indexOf(sortField) !== -1) {
-        data.applicants.sort(function (a, b) {
+        applicants.sort(function (a, b) {
           return a[sortField] > b[sortField] ? 1 : -1;
         });
       }
-      renderGrid(data.applicants);
+      renderGrid(applicants);
+    }).fail(function () {
+      renderGrid([]);
     });
   }
 
