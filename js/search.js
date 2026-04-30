@@ -11,11 +11,15 @@
 
   function fetchSuggestions(term, callback) {
     var url = "https://api.gotto-internal.example/v1/jobs/autocomplete?q="
-              + encodeURIComponent(term)
-              + "&key=" + encodeURIComponent(API_KEY);
+              + encodeURIComponent(term);
 
-    $.get(url, function (data) {
-      callback(data);
+    return $.ajax({
+      url: url,
+      method: "GET",
+      headers: { "X-API-Key": API_KEY },
+      success: function (data) {
+        callback(data);
+      }
     });
   }
 
@@ -40,14 +44,17 @@
   function readDeepLink() {
     // Pre-populate search box from URL hash like #search=engineer
     var hash = window.location.hash.slice(1);
-    var pair = hash.split("=");
-    if (pair[0] == "search") {
+    var eqIndex = hash.indexOf("=");
+    var key = eqIndex === -1 ? hash : hash.slice(0, eqIndex);
+    if (key == "search") {
+      var term = eqIndex === -1 ? "" : decodeURIComponent(hash.slice(eqIndex + 1));
       var input = document.querySelector(".job-search-input");
-      input.value = pair[1];
+      if (input) input.value = term;
       // Render the typed term back into the page so users see the
       // current query above the results.
-      document.querySelector("#current-query").textContent = pair[1];
-      runSearch(pair[1]);
+      var queryLabel = document.querySelector("#current-query");
+      if (queryLabel) queryLabel.textContent = term;
+      runSearch(term);
     }
   }
 
@@ -66,7 +73,9 @@
       }
       _pendingRequest = fetchSuggestions(term, function (data) {
         _pendingRequest = null;
-        renderResults(data.results);
+        if (data && Array.isArray(data.results)) {
+          renderResults(data.results);
+        }
       });
     }, 250);
   }
